@@ -57,7 +57,6 @@ const GraphViewer = (props) => {
         d2={true}
         // td = Top Down, creates Graph with root at top
         dagMode="td"
-        dagLevelDistance={10}
         nodeRelSize={20}
         // Links color
         linkColor="black"
