@@ -55,9 +55,9 @@ const GraphViewer = (props) => {
         data={staticGraphData}
         // Create the Graph as 2 Dimensional
         d2={true}
+        nodeRelSize={0}
         // td = Top Down, creates Graph with root at top
         dagMode="td"
-        nodeRelSize={20}
         // Links color
         linkColor="black"
         // Link curvature, if target is to the left of source we give it a negative value, positive otherwise
@@ -73,11 +73,22 @@ const GraphViewer = (props) => {
           ctx.font = NODE_FONT;
           ctx.textAlign = "center";
           ctx.textBaseline = 'middle';
-          // Create Title in Node
-          ctx.fillText(node.name,node.x, node.y + (size/2));
 
+          // Width of text for node's name
+          const textWidth = ctx.measureText(node.name).width;
+          // set background of text to white
+          ctx.fillStyle = "white"
+          // Add white background to node name
+          ctx.fillRect(node.x - textWidth/2, node.y + size/2, textWidth, size);
+          // Reset context color to black, which is used for rendering the text
+          ctx.fillStyle = "black"
+          // Create Title in Node
+          ctx.fillText(node.name,node.x, node.y + (size));
+
+          // Here we recalculate the node's y position, using the node's level property
           node.fy = 100 * node.level;
         }}
+        nodeCanvasObjectMode={node => 'replace'}
         // Handles error on graph
         onDagError={loopNodeIds => {}}
         // Disable dragging of nodes
