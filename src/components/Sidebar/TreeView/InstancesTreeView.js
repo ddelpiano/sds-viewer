@@ -20,30 +20,35 @@ const InstancesTreeView = (props) => {
   const [items, setItems] = useState(datasets);
   const widgets = useSelector(state => state.widgets);
 
-  const onNodeSelect = (e, nodeId) => {
+  const onNodeSelect = (e, nodeId, isOpenFile = false) => {
     const node = window.datasets[dataset_id].splinter.tree_map.get(nodeId);
-    dispatch(selectInstance({
-      dataset_id: dataset_id,
-      graph_node: node?.graph_reference?.id,
-      tree_node: node.id,
-      source: TREE_SOURCE
-    }));
-    if (widgets[dataset_id] !== undefined) {
-      widgets[dataset_id].status = WidgetStatus.ACTIVE;
-      dispatch(layoutActions.updateWidget(widgets[dataset_id]));
+
+    if (isOpenFile) {
+      const publishedURI = node.graph_reference?.attributes?.publishedURI;
+      if (publishedURI) {
+        window.open(publishedURI, '_blank');
+      }
+    } else {
+      dispatch(selectInstance({
+        dataset_id: dataset_id,
+        graph_node: node?.graph_reference?.id || node?.id,
+        tree_node: node?.id,
+        source: TREE_SOURCE
+      }));
+      if (widgets[dataset_id] !== undefined) {
+        widgets[dataset_id].status = WidgetStatus.ACTIVE;
+        dispatch(layoutActions.updateWidget(widgets[dataset_id]));
+      }
+      if (widgets[dataset_id] !== undefined) {
+        widgets[dataset_id].status = WidgetStatus.ACTIVE;
+        dispatch(layoutActions.updateWidget(widgets[dataset_id]));
+      }
     }
-    if (widgets[dataset_id] !== undefined) {
-      widgets[dataset_id].status = WidgetStatus.ACTIVE;
-      dispatch(layoutActions.updateWidget(widgets[dataset_id]));
-    }
+
   };
 
   const onNodeToggle = (e, nodeIds) => {
-    if (nodeIds.length === 0) {
-      return;
-    }
-
-    if ((nodes.length !== nodeIds.length) && (nodes[0] === nodeIds[0])) {
+    if ((nodes.length !== nodeIds?.length) && (nodes[0] === nodeIds?.[0])) {
       var original = [...nodes];
       var newPath = [...nodeIds];
       while (original[0] === newPath[0]) {
@@ -56,6 +61,8 @@ const InstancesTreeView = (props) => {
     const node = window.datasets[dataset_id].splinter.tree_map.get(nodeIds[0]);
     if (node && node.path !== undefined && node.path[0] !== nodes[0]) {
       setNodes(node.path);
+    } else {
+      setNodes([]);
     }
   };
 
@@ -129,11 +136,11 @@ const InstancesTreeView = (props) => {
         { labelIcon: DATASET, iconClass: 'dataset' }
         : itemLength > 0 ? { labelIcon: FOLDER, iconClass: 'folder' }
         : { labelIcon: FILE, iconClass: 'file' };
-
       return (
         <StyledTreeItem
-          dataset={treeItemData?.dataset_id}
+          dataset={dataset_id}
           nodeId={treeItemData?.id}
+          id={treeItemData?.id}
           labelText={treeItemData?.text}
           labelIcon={labelProps?.labelIcon}
           labelInfo={itemLength}
@@ -159,6 +166,7 @@ const InstancesTreeView = (props) => {
         ref={treeRef}
         expanded={nodes}
         onNodeToggle={onNodeToggle}
+        selected={[nodeSelected?.tree_node?.id]}
       >
         { getTreeItemsFromData(items) }
       </TreeView>

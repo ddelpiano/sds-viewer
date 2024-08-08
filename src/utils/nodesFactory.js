@@ -6,7 +6,9 @@ function createImage(node) {
         const extension = node.name.split(".").pop();
         img.src = "./images/graph/files/" + extension + ".svg"
     } else {
-        img.src = (rdfTypes[String(node.type)]?.image !== "") ? rdfTypes[String(node.type)].image : rdfTypes.Uknown.image
+        if ( node.type !== "Group" ) {
+            img.src = (rdfTypes[String(node.type)]?.image !== "") ? rdfTypes[String(node.type)]?.image : rdfTypes.Unknown?.image
+        }
     }
     return img;
 }
@@ -23,6 +25,32 @@ function extractProperties(node, ttlTypes) {
                 } else {
                     node.attributes[type_property.property] = [];
                     node.attributes[type_property.property].push(property.value);
+                }
+            }
+        }
+    }
+
+    if (node.additional_properties) {
+        for (const json_prop of rdfTypes[node.type].additional_properties) {
+            let new_attribute = node.additional_properties;
+            for (const step of json_prop.path) {
+                if (new_attribute[step] !== undefined) {
+                    new_attribute = new_attribute[step];
+                } else {
+                    new_attribute = undefined;
+                    break;
+                }
+            }
+            if (new_attribute !== undefined) {
+                if (typeof new_attribute === 'object' && new_attribute !== null && new_attribute[json_prop.innerPath]) {
+                    new_attribute = new_attribute[json_prop.innerPath];
+                }
+
+                node.attributes[json_prop.property] = [];
+                if (json_prop.type === 'string') {
+                    node.attributes[json_prop.property].push(new_attribute.replace(json_prop.trimType, ''));
+                } else {
+                    node.attributes[json_prop.property].push(parseFloat(new_attribute));
                 }
             }
         }
@@ -123,6 +151,12 @@ const Protocol = function (node, ttlTypes) {
 const Sample = function (node, ttlTypes) {
     node.img = createImage(node);
     extractProperties(node, ttlTypes);
+    if (node.attributes?.identifier !== undefined) {
+        node.name = node.attributes?.identifier[0];
+    } else {
+        let namesArray = node.name.split("/");
+        node.name = namesArray[namesArray.length - 1];
+    }
     return node;
 };
 

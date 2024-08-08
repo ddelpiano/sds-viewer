@@ -1,6 +1,9 @@
 export const IMPORT_TEXT = 'Import a new dataset';
+export const ADD_DATASET = 'Import Dataset';
+export const LIST_DATASETS = 'List Datasets';
+export const SPARC_DATASETS = 'SPARC Datasets';
 export const FILE_UPLOAD_PARAMS = {
-  acceptedFileExtensions: ['.json', '.ttl'],
+  acceptedFileExtensions: ['json', 'ttl'],
   maxFileSize: 5242880,
   maxFiles: 6,
 };
@@ -14,3 +17,6 @@ export const contributors_key = "all_contributors";
 
 export const GRAPH_SOURCE = "GRAPH";
 export const TREE_SOURCE = "TREE";
+export const SUBJECTS_LEVEL = 2;
+export const PROTOCOLS_LEVEL = 2;
+export const CRONTRIBUTORS_LEVEL = 2;

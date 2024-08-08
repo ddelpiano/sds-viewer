@@ -450,7 +450,8 @@
   width: 24px;
   height: 24px;
   background: #ffffff;
-  border: 1px solid rgba(46, 58, 89, 0.1);
+  border: 1px solid #E1E3E8;
+  color : #435070;
   box-sizing: border-box;
   box-shadow: 0px 0px 27px rgba(0, 0, 0, 0.05);
   border-radius: 24px;
@@ -477,7 +478,7 @@
   height: 25px;
 }
 
-.graph-view_controls .MuiIconButton-root:nth-child(4) {
+.graph-view_controls .MuiIconButton-root:nth-child(4) , .graph-view_controls .MuiIconButton-root:nth-child(5){
   margin-top: 8px;
 }
 
@@ -501,4 +502,52 @@
   color: #11bffe !important;
   width: 10vh !important;
   height : 10vh !important;
+}
+
+.datasets_list {
+  padding: 0 1rem 1rem 1rem;
+  overflow : hidden;
+}
+
+.dataset_item {
+  cursor: pointer;
+}
+
+.datasets_loader {
+  color : #3779E1 !important;
+  margin: 0 auto;
+  display: block !important;
+}
+
+.datasets_dialog {
+  height : 100%;
+  width: 50rem !important;
+  max-width: 50rem !important;
+  margin : 0 auto;
+}
+
+.datasets_dialog_list {
+  max-height : 20rem;
+  overflow: auto;
+}
+
+.dialog_close {
+  float: right;
+}
+
+.dialog_close:hover {
+  cursor: pointer;
+}
+
+.datasets_list_results {
+  color : #3779E1 !important;
+}
+
+.dataset_list_text {
+  font-size: 15px;
+}
+
+.breadcrumb_selected {
+  color : #3779E1 !important;
+  font-weight: 600 !important;
 }

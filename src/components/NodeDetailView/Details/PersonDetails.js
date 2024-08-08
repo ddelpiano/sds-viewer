@@ -1,8 +1,9 @@
-import React from "react";
 import {
     Box,
+    Divider,
+    Typography,
 } from "@material-ui/core";
-import SimpleLabelValue from './Views/SimpleLabelValue';
+import Links from './Views/Links';
 import { detailsLabel } from '../../../constants';
 
 const PersonDetails = (props) => {
@@ -26,8 +27,14 @@ const PersonDetails = (props) => {
 
     return (
         <Box id={idDetails}>
+            <Divider />
             <Box className="tab-content">
-                <SimpleLabelValue label={'Name'} value={title.toString()} heading={'Contributor Details'} />
+                <Typography component="h3">Person Details</Typography>
+                <Box className="tab-content-row">
+                    <Typography component="label">Name</Typography>
+                    <Links key={`name_href_link`} href={node.graph_node?.id} title={title.toString()} />
+                    {/* <SimpleLabelValue label={'Name'} value={title.toString()} heading={'Contributor Details'} /> */}
+                </Box>
             </Box>
         </Box>
     );

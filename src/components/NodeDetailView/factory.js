@@ -12,8 +12,9 @@ import SampleDetails from './Details/SampleDetails';
 import DatasetDetails from './Details/DatasetDetails';
 import SubjectDetails from './Details/SubjectDetails';
 import ProtocolDetails from './Details/ProtocolDetails';
-import CollectionDetails from './Details/CollectionDetails';
-
+import GroupDetails from './Details/GroupDetails';
+import CollectionDetails from './Details/CollectionDetails'
+import Settings from "./settings/Settings"
 var DetailsFactory = function () {
     this.createDetails = function (node) {
         let details = null;
@@ -26,6 +27,9 @@ var DetailsFactory = function () {
         switch(type) {
             case rdfTypes.Collection.key:
                 details = new Collection(node);
+                break;
+            case rdfTypes.Group.key:
+                details = new Group(node);
                 break;
             case rdfTypes.Dataset.key:
                 details = new Dataset(node);
@@ -81,6 +85,53 @@ const Collection = function (node) {
             </>
         )
     }
+
+    nodeDetail.getSettings = () => {
+        return (
+            <>
+                <Settings node={node} />
+            </>
+        )
+    }
+    return nodeDetail;
+};
+
+const Group = function (node) {
+    const nodeDetail = {
+        node: node
+    };
+    nodeDetail.getHeader = () => {
+        return (
+            <>
+                <CollectionHeader node={node} />
+            </>
+        )
+    };
+
+    nodeDetail.getDetail = () => {
+        return (
+            <>
+                <GroupDetails node={node} />
+            </>
+        )
+    };
+
+    nodeDetail.getAll = () => {
+        return (
+            <>
+                <CollectionHeader node={node} />
+                <GroupDetails node={node} />
+            </>
+        )
+    }
+    
+    nodeDetail.getSettings = () => {
+        return (
+            <>
+                <Settings node={node} />
+            </>
+        )
+    }
     return nodeDetail;
 };
 
@@ -109,6 +160,14 @@ const Dataset = function (node) {
             <>
                 <DatasetHeader node={node} />
                 <DatasetDetails node={node} />
+            </>
+        )
+    }
+
+    nodeDetail.getSettings = () => {
+        return (
+            <>
+                <Settings node={node} />
             </>
         )
     }
@@ -174,6 +233,14 @@ const Sample = function (node) {
             </>
         )
     }
+
+    nodeDetail.getSettings = () => {
+        return (
+            <>
+                <Settings node={node} />
+            </>
+        )
+    }
     return nodeDetail;
 };
 
@@ -205,6 +272,14 @@ const Subject = function (node) {
             </>
         )
     }
+
+    nodeDetail.getSettings = () => {
+        return (
+            <>
+                <Settings node={node} />
+            </>
+        )
+    }
     return nodeDetail;
 };
 
@@ -233,6 +308,14 @@ const File = function (node) {
             <>
                 <FileHeader node={node} />
                 <FileDetails node={node} />
+            </>
+        )
+    }
+
+    nodeDetail.getSettings = () => {
+        return (
+            <>
+                <Settings node={node} />
             </>
         )
     }

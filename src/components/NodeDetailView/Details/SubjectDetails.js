@@ -1,91 +1,71 @@
-import React from "react";
 import {
     Box,
+    Divider,
     Typography,
 } from "@material-ui/core";
-import SimpleChip from './Views/SimpleChip';
+import SimpleLinkedChip from './Views/SimpleLinkedChip';
 import SimpleLabelValue from './Views/SimpleLabelValue';
 import Links from './Views/Links';
-import { iterateSimpleValue } from './utils';
 import { detailsLabel } from '../../../constants';
+import { isValidUrl } from './utils';
+import { useSelector } from 'react-redux'
 
 const SubjectDetails = (props) => {
     const { node } = props;
 
-    let title = "";
-    let idDetails = "";
-    // both tree and graph nodes are present, extract data from both
-    if (node.tree_node && node.graph_node) {
-        idDetails = node?.tree_node?.id + detailsLabel;
-        title = node?.tree_node?.basename;
-    // the below is the case where we have data only from the tree/hierarchy
-    } else if (node?.graph_node) {
-        idDetails = node?.graph_node?.id + detailsLabel;
-        title = node.graph_node.name;
-    // the below is the case where we have data only from the graph
-    } else {
-        idDetails = node.tree_node.id + detailsLabel;
-        title = node.tree_node.basename;
-    }
+    const subjectPropertiesModel = useSelector(state => state.sdsState.metadata_model.subject);
 
-    const populateAttributeArray = (array, prop) => {
-        array = prop.map( item => {
-            return item;
-        })
-    }
+    const getGroupNode = (groupName, node)=> {
+        let n = node.graph_node.parent;
+        let match = false;
+        while ( n && !match ) {
+            if ( n.name === groupName ) {
+              match = true;
+            } else {
+              n = n.parent;
+            }
+        }
 
-    let species = [];
-    let strains = [];
-    let assignedGroups = [];
-    if (node.graph_node?.attributes?.hasAssignedGroup !== undefined) {
-        populateAttributeArray(assignedGroups, node.graph_node.attributes.hasAssignedGroup);
-    }
-    if (node.graph_node?.attributes?.subjectSpecies !== undefined) {
-        populateAttributeArray(species, node.graph_node.attributes.subjectSpecies);
-    }
-    if (node.graph_node?.attributes?.subjectStrain !== undefined) {
-        populateAttributeArray(strains, node.graph_node.attributes.subjectStrain);
+        return n;
     }
 
     return (
-        <Box id={idDetails}>
+        <Box id={node?.graph_node?.id + detailsLabel}>
+            <Divider />
             <Box className="tab-content">
-                <SimpleLabelValue label={'Label'} value={title} heading={'Subject Details'} />
+                <SimpleLabelValue label={""} value={""} heading={"Subject Details"} />
 
-                { iterateSimpleValue('Age', node?.graph_node?.attributes?.age) }
-                { iterateSimpleValue('Age Category', node?.graph_node?.attributes?.hasAgeCategory) }
-                { iterateSimpleValue('Biological Sex', node?.graph_node?.attributes?.biologicalSex) }
-                { <Box className="tab-content-row">
-                    <Links href={node?.graph_node?.attributes?.hasDerivedInformationAsParticipant} title="Derived information as participant" />
-                  </Box>
-                }
-                { <Box className="tab-content-row">
-                    <Links href={node?.graph_node?.attributes?.participantInPerformanceOf} title="Participant in performance of" />
-                  </Box>
-                }
-                { iterateSimpleValue('Specimen identifier', node?.graph_node?.attributes?.specimenHasIdentifier) }
+                {subjectPropertiesModel?.map( property => {
+                    if ( property.visible ){
+                        const propValue = node.graph_node.attributes[property.property]?.[0];
+                        if ( property.isGroup ){
+                            return (<Box className="tab-content-row">
+                                        <Typography component="label">{property.label}</Typography>
+                                        <SimpleLinkedChip chips={[{ value : node.graph_node.attributes[property.property]}]} node={getGroupNode(node.graph_node.attributes[property.property]?.[0], node)} />
+                                    </Box>)
+                        }
 
-                { species.length > 0
-                    ? ( <Box className="tab-content-row">
-                            <Typography component="label">Species</Typography>
-                            <SimpleChip chips={species} />
-                        </Box>)
-                    : <> </>
-                }
-                { strains.length > 0
-                    ? ( <Box className="tab-content-row">
-                            <Typography component="label">Strains</Typography>
-                            <SimpleChip chips={strains} />
-                        </Box>)
-                    : <> </>
-                }
-                { assignedGroups.length > 0
-                    ? ( <Box className="tab-content-row">
-                            <Typography component="label">Assigned Groups</Typography>
-                            <SimpleChip chips={assignedGroups} />
-                        </Box>)
-                    : <> </>
-                }
+                        else if ( isValidUrl(propValue) ){
+                            return (<Box className="tab-content-row">
+                                <Typography component="label">{property.label}</Typography>
+                                <Links key={`detail_links_dataset`} href={propValue} title={property.label + " Link"} />
+                            </Box>)
+                        }
+
+                        else if ( typeof propValue === "object" ){
+                            return (<Box className="tab-content-row">
+                                        <Typography component="label">{property.label}</Typography>
+                                        <SimpleLinkedChip chips={node.graph_node.attributes[property.property]} />
+                                    </Box>)
+                        }
+
+                        else if ( typeof propValue === "string" ){
+                            return (<SimpleLabelValue label={property.label} value={propValue} />)
+                        }
+
+                        return (<> </>)
+                    }
+                })}
             </Box>
         </Box>
     );
